@@ -12,10 +12,12 @@ import java.util.List;
 public class MainController {
 
     DataFromRestRepository dataFromRestRepository = new DataFromRestRepository("http://localhost:8081/cost");
+    DataFromRestRepository dataFromRestRepository2 = new DataFromRestRepository("http://localhost:8081/cost2");
 
     @GetMapping(value = "/")
     public String index(Model model) {
         model.addAttribute("info",dataFromRestRepository.getTovar());
+        model.addAttribute("info2",dataFromRestRepository2.getTovar());
         return "index";
     }
 

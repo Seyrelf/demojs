@@ -8,8 +8,10 @@
     <title>Document</title>
 </head>
 <body>
-<div class="col-md-auto">
-    <table class="table-info table-bordered border-primary" id="ddd" style="min-width: 500px ;background: gainsboro">
+<div class="wrapper" style="display: flex">
+    <div>
+    <div style="height:300px;overflow-y:scroll;">
+    <table class="table-info table-bordered border-primary" id="ddd" style="background: gainsboro">
         <thead>
         <tr>
             <th scope="col">id</th>
@@ -26,14 +28,38 @@
             </tr>
         </th:block>
         </tbody>
-    </table>
-    <button class="myButton" type="button" onclick="myFunc()">press </button>
-    <canvas id="myChartCost" style="min-height: 300px"> </canvas>
+    </table></div>
 
-</div>
+        <div style="height:300px;overflow-y:scroll;">
+            <table class="table-info table-bordered border-primary" id="dd" style="background: gainsboro">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Cost</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="cos : ${info2}">
+                    <tr>
+                        <td >[[${cos.id}]]</td>
+                        <td>[[${cos.date}]]</td>
+                        <td>[[${cos.cost}]]</td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table></div>
+
+    <button class="myButton" type="button" onclick="myFunc()">press </button></div>
+    <div><canvas id="myChartCost" style="background: slategrey;height: 700px; width: 1700px"> </canvas></div></div>
+</body>
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
     var cost = [[${info}]];
+    var cost2 = [[${info2}]];
     console.log(cost)
     const chartCost= document.getElementById('myChartCost');
     var chart = new Chart(chartCost,{
@@ -41,16 +67,43 @@
         data:{
             labels: cost.map(row => row.date),
             datasets:[{
+                borderColor: 'rgb(205, 0, 0)',
+                backgroundColor: '#FFB1C1',
                 label: "Cost",
-                data: cost.map(row => row.cost)}]}});
+                data: cost.map(row => row.cost),
+                tension: 0.3},
+                {
+                borderColor: 'rgb(0,0,205)',
+                backgroundColor: '#9BD0F5',
+                label: "Cost2",
+                data: cost2.map(row => row.cost),
+                tension: 0.3
+                }
 
-    document.getElementById('ddd').onload = setInterval(myFunc,1000);
+            ]
+        }});
+
+    document.getElementById('ddd').onclick = setInterval(myFunc,15000);
     async function myFunc(){
-    cost = await fetch("http://localhost:8080/info",{method:"GET"}).then(async response => await response.json());
-    console.log(cost)
-    chart.data.datasets = cost.map(row => row.cost);
-    chart.data.labels = cost.map(row => row.date);
-    chart.update();
+        cost = await fetch("http://localhost:8080/info30",{method:"GET"}).then(async response => await response.json());
+        cost2 = await fetch("http://localhost:8080/info230",{method:"GET"}).then(async response => await response.json());
+        console.log(cost)
+        chart.data.datasets[0] = {
+            borderColor: 'rgb(205, 0, 0)',
+            backgroundColor: '#FFB1C1',
+            tension: 0.1,
+            label: "Cost",
+            data: cost.map(row => row.cost)}
+        chart.data.datasets[1] = {
+            borderColor: 'rgb(0,0,205)',
+            backgroundColor: '#9BD0F5',
+            tension: 0.1,
+            label: "Cost2",
+            data: cost2.map(row => row.cost),
+            }
+        ;
+        chart.data.labels = cost.map(row => row.date);
+        chart.update('none');
     }
 </script>
 </body>
