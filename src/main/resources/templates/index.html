@@ -10,25 +10,25 @@
 <body>
 <div class="wrapper" style="display: flex">
     <div>
-    <div style="height:300px;overflow-y:scroll;">
-    <table class="table-info table-bordered border-primary" id="ddd" style="background: gainsboro">
-        <thead>
-        <tr>
-            <th scope="col">id</th>
-            <th scope="col">Date</th>
-            <th scope="col">Cost</th>
-        </tr>
-        </thead>
-        <tbody>
-        <th:block th:each="cos : ${info}">
-            <tr>
-                <td >[[${cos.id}]]</td>
-                <td>[[${cos.date}]]</td>
-                <td>[[${cos.cost}]]</td>
-            </tr>
-        </th:block>
-        </tbody>
-    </table></div>
+        <div style="height:300px;overflow-y:scroll;">
+            <table class="table-info table-bordered border-primary" id="ddd" style="background: gainsboro">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Cost</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="cos : ${info}">
+                    <tr>
+                        <td >[[${cos.id}]]</td>
+                        <td>[[${cos.date}]]</td>
+                        <td>[[${cos.cost}]]</td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table></div>
 
         <div style="height:300px;overflow-y:scroll;">
             <table class="table-info table-bordered border-primary" id="dd" style="background: gainsboro">
@@ -56,48 +56,78 @@
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 <script th:inline="javascript">
     var cost = [[${info}]];
     var cost2 = [[${info2}]];
     console.log(cost)
     const chartCost= document.getElementById('myChartCost');
+    var info1 = [];
+    var info2 = [];
+
+    for(i in cost){
+        info1.push({x:cost[i].date,y:cost[i].cost});
+    }
+    for(i in cost2){
+        info2.push({x:cost2[i].date,y:cost2[i].cost});
+    }
+    console.log(info1)
+    console.log(info2)
     var chart = new Chart(chartCost,{
-        type: 'line',
+        type: 'scatter',
         data:{
-            labels: cost.map(row => row.date),
             datasets:[{
                 borderColor: 'rgb(205, 0, 0)',
                 backgroundColor: '#FFB1C1',
                 label: "Cost",
-                data: cost.map(row => row.cost),
+                showLine: true,
+                data: info1,
                 tension: 0.3},
                 {
                 borderColor: 'rgb(0,0,205)',
                 backgroundColor: '#9BD0F5',
                 label: "Cost2",
-                data: cost2.map(row => row.cost),
-                tension: 0.3
+                showLine: true,
+                data: info2,
+                tension: 0.3}]},
+        options: {
+            responsive: false,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        parser: 'YYYY-MM-DD HH:mm:ss',
+                        unit: 'second',
+                        displayFormats: {
+                            second: 'DD MM YYYY hh:mm:ss'
+                        },
+                        tooltipFormat: 'DD MM YYYY hh:mm:ss'
+                    }
                 }
+            }
+        }
+    });
 
-            ]
-        }});
-
-    document.getElementById('ddd').onclick = setInterval(myFunc,15000);
     async function myFunc(){
         cost = await fetch("http://localhost:8080/info30",{method:"GET"}).then(async response => await response.json());
         cost2 = await fetch("http://localhost:8080/info230",{method:"GET"}).then(async response => await response.json());
+
         console.log(cost)
         chart.data.datasets[0] = {
             borderColor: 'rgb(205, 0, 0)',
             backgroundColor: '#FFB1C1',
             tension: 0.1,
+            showLine: true,
+
             label: "Cost",
             data: cost.map(row => row.cost)}
         chart.data.datasets[1] = {
             borderColor: 'rgb(0,0,205)',
             backgroundColor: '#9BD0F5',
             tension: 0.1,
+            showLine: true,
             label: "Cost2",
             data: cost2.map(row => row.cost),
             }

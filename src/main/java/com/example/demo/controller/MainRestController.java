@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,12 +29,15 @@ public class MainRestController {
 
     @GetMapping(value = "/info30")
     public List<ResponseDto> index30() {
-        return dataFromRestRepository.getTovar().stream().filter(s -> s.getDate().isAfter(LocalDateTime.now().minusMinutes(5))).collect(Collectors.toList());
+        List<ResponseDto> res = dataFromRestRepository.getTovar().stream().filter(s -> s.getId()>5955).collect(Collectors.toList());
+        return res;
     }
 
     @GetMapping(value = "/info230")
     public List<ResponseDto> index230() {
-        return dataFromRestRepository2.getTovar().stream().filter(s -> s.getDate().isAfter(LocalDateTime.now().minusMinutes(5))).collect(Collectors.toList());
+        List <ResponseDto> res = dataFromRestRepository2.getTovar();
+
+        return res.stream().filter(s -> s.getId()>7000).collect(Collectors.toList());
     }
 
 
