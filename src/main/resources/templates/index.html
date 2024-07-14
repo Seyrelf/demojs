@@ -39,7 +39,7 @@
                     <th scope="col">Cost</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="table_body">
                 <th:block th:each="cos : ${info2}">
                     <tr>
                         <td >[[${cos.id}]]</td>
@@ -62,7 +62,6 @@
 <script th:inline="javascript">
     var cost = [[${info}]];
     var cost2 = [[${info2}]];
-    console.log(cost)
     const chartCost= document.getElementById('myChartCost');
     var info1 = [];
     var info2 = [];
@@ -73,8 +72,6 @@
     for(i in cost2){
         info2.push({x:cost2[i].date,y:cost2[i].cost});
     }
-    console.log(info1)
-    console.log(info2)
     var chart = new Chart(chartCost,{
         type: 'scatter',
         data:{
@@ -94,6 +91,7 @@
                 tension: 0.3}]},
         options: {
             responsive: false,
+            locale:"ru",
             scales: {
                 x: {
                     type: 'time',
@@ -101,9 +99,8 @@
                         parser: 'YYYY-MM-DD HH:mm:ss',
                         unit: 'second',
                         displayFormats: {
-                            second: 'DD MM YYYY hh:mm:ss'
+                            second: 'DD MM YYYY HH:mm:ss'
                         },
-                        tooltipFormat: 'DD MM YYYY hh:mm:ss'
                     }
                 }
             }
@@ -113,6 +110,27 @@
     async function myFunc(){
         cost = await fetch("http://localhost:8080/info30",{method:"GET"}).then(async response => await response.json());
         cost2 = await fetch("http://localhost:8080/info230",{method:"GET"}).then(async response => await response.json());
+        var table = document.getElementById("table_body");
+        var table_main = document.getElementById("dd");
+        table_main.removeChild(table);
+        table.value = [];
+        table = document.createElement('tbody')
+        for(var i = cost2.length-1;i>0;i-=1){
+            var td1 = document.createElement('td')
+            var td2 = document.createElement('td')
+            var td3 = document.createElement('td')
+            var tr = document.createElement('tr')
+            td3.innerHTML = cost2[i].cost;
+            td2.innerHTML = cost2[i].date;
+            td1.innerHTML = cost2[i].id;
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            table.appendChild(tr)
+        }
+
+        table_main.appendChild(table);
+        console.log(table.childNodes);
 
         console.log(cost)
         chart.data.datasets[0] = {
